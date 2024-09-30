@@ -46,7 +46,7 @@ function uploadFiles() {
         uploadTask.on('state_changed', 
             (snapshot) => {
                 totalBytesTransferred += snapshot.bytesTransferred;
-                const progress = (totalBytesTransferred / totalSize) * 100;
+                const progress = (totalBytesTransferred / (totalSize*20)) * 100;
                 progressBar.value = progress;
                 progressText.innerHTML = `Upload is ${progress.toFixed(2)}% done`;
             }, 
@@ -58,13 +58,15 @@ function uploadFiles() {
                 progressBar.value = 0;
                 progressText.innerHTML = '';
                 displayUploadedFiles();
-
+                
                 // Clear file input after successful upload
                 document.getElementById('file-upload').value = '';
             }
         );
     }
 }
+
+
 
 // Function to display uploaded files
 function displayUploadedFiles() {
@@ -86,16 +88,23 @@ function displayUploadedFiles() {
                 getDownloadURL(itemRef).then(downloadURL => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        
-                        (${filesProcessed+1}) ${metadata.name} (${fileSizeMB.toFixed(3)} MB) 
+                        (${filesProcessed + 1}) ${metadata.name} (${fileSizeMB.toFixed(3)} MB) 
                         <div class="btn">
-                        <button onclick="deleteFile('${metadata.name}')">Delete</button>
-                        <button>View File</button>
+                            <button class="delete-btn">Delete</button>
+                            <button class="view-btn">View File</button>
                         </div>
-                        <a href="${downloadURL}" target="_blank">
-                        </a>
                     `;
+
+                    // Add event listeners after appending the element
                     fileList.appendChild(listItem);
+
+                    // Attach delete file functionality
+                    listItem.querySelector('.delete-btn').addEventListener('click', () => deleteFile(metadata.name));
+
+                    // Attach view file functionality
+                    listItem.querySelector('.view-btn').addEventListener('click', () => {
+                        window.open(downloadURL, '_blank'); // Open the file in a new tab
+                    });
 
                     // Increment processed files count
                     filesProcessed++;
@@ -120,18 +129,19 @@ function displayUploadedFiles() {
 
 
 
+
 // Function to delete a file
 function deleteFile(fileName) {
-
+    
     // Using the prompt() function to get user input
     const userInput = prompt("Enter password to delete file:", "eg: 1234");
-
+    
     // Check if user provided input
     if (userInput !== "bib") {
         alert("Delete Failed");
         return;
     } 
-
+    
     const fileRef = ref(storage, fileName);
     deleteObject(fileRef).then(() => {
         alert('File deleted successfully.');
