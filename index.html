@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploads</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Uploaded Files</h1><br>
+        <ul id="file-list"></ul>
+
+        <input type="file" id="file-upload" multiple />
+        <button onclick="uploadFiles()">Upload</button>
+
+        <!-- Progress bar with percentage -->
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <span id="progress-text"></span>
+        <b id="total-size">Total file size: </b>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
