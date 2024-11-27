@@ -126,7 +126,33 @@ function displayUploadedFiles() {
 }
 
 
+function encrypt(s, f) {
+    var strArr = s.split(''); // Convert the string to an array of characters
+    var sum;
 
+    function process() {
+        sum = strArr.length;
+
+        for (var i = 0; i < strArr.length; i++) {
+            sum += strArr[i].charCodeAt(0);
+            sum %= 128;
+            var c = Math.max(37, sum);
+            var newChar = strArr[i].charCodeAt(0) ^ c;
+            if (newChar <= 33) {
+                newChar += 32;
+            } else {
+                newChar--;
+            }
+            strArr[i] = String.fromCharCode(newChar);
+        }
+    }
+
+    while (f-- > 0) {
+        process();
+    }
+
+    return strArr.join(''); // Convert the array back to a string
+}
 
 
 
@@ -137,7 +163,7 @@ function deleteFile(fileName) {
     const userInput = prompt("Enter password to delete file:", "eg: 1234");
     
     // Check if user provided input
-    if (userInput !== "bib") {
+    if (encrypt(userInput,5) !== "#!5") {
         alert("Delete Failed");
         return;
     } 
