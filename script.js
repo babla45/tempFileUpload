@@ -22,7 +22,7 @@ function uploadFiles() {
     const files = document.getElementById('file-upload').files;
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
-    
+
     if (!files.length) {
         alert('Please select files to upload.');
         return;
@@ -43,29 +43,34 @@ function uploadFiles() {
         const fileRef = ref(storage, file.name);
         const uploadTask = uploadBytesResumable(fileRef, file);
 
-        uploadTask.on('state_changed', 
+        uploadTask.on(
+            'state_changed',
             (snapshot) => {
-                totalBytesTransferred += snapshot.bytesTransferred;
-                const progress = (totalBytesTransferred / (totalSize*20)) * 100;
-                progressBar.value = progress;
-                progressText.innerHTML = `Upload is ${progress.toFixed(2)}% done`;
-            }, 
+                const currentFileProgress = snapshot.bytesTransferred / file.size;
+                const totalProgress = ((totalBytesTransferred + snapshot.bytesTransferred) / totalSize) * 100;
+
+                progressBar.value = totalProgress;
+                progressText.innerHTML = `Upload is ${totalProgress.toFixed(2)}% done`;
+            },
             (error) => {
                 alert('Error uploading file:', error);
-            }, 
+            },
             () => {
-                alert('Files uploaded successfully.');
-                progressBar.value = 0;
-                progressText.innerHTML = '';
-                displayUploadedFiles();
-                
-                // Clear file input after successful upload
-                document.getElementById('file-upload').value = '';
+                totalBytesTransferred += file.size;
+
+                if (totalBytesTransferred === totalSize) {
+                    alert('All files uploaded successfully.');
+                    progressBar.value = 0;
+                    progressText.innerHTML = '';
+                    displayUploadedFiles();
+
+                    // Clear file input after successful upload
+                    document.getElementById('file-upload').value = '';
+                }
             }
         );
     }
 }
-
 
 
 // Function to display uploaded files
@@ -74,55 +79,64 @@ function displayUploadedFiles() {
     const total_size = document.getElementById('total-size');
     fileList.innerHTML = ''; // Clear existing list
     let tot = 0; // Total size in MB
-    let filesProcessed = 0; // Track processed files
 
-    listAll(storageRef).then(res => {
-        const totalFiles = res.items.length; // Get total number of files
+    listAll(storageRef)
+        .then((res) => {
+            // Map metadata and download URL fetching into promises
+            const filePromises = res.items.map((itemRef) =>
+                getMetadata(itemRef)
+                    .then((metadata) => ({
+                        name: metadata.name,
+                        size: metadata.size,
+                        updated: metadata.updated,
+                        ref: itemRef,
+                    }))
+                    .then((file) =>
+                        getDownloadURL(file.ref).then((downloadURL) => ({
+                            ...file,
+                            downloadURL,
+                        }))
+                    )
+            );
 
-        res.items.forEach(itemRef => {
-            getMetadata(itemRef).then(metadata => {
-                const fileSizeMB = (metadata.size / (1024 * 1024)); // Size in MB (unrounded)
-                tot += fileSizeMB; // Accumulate file size
-                
-                // Get the download URL for each file
-                getDownloadURL(itemRef).then(downloadURL => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `
-                        (${filesProcessed + 1}) ${metadata.name} (${fileSizeMB.toFixed(3)} MB) 
-                        <div class="btn">
-                            <button class="delete-btn">Delete</button>
-                            <button class="view-btn">View File</button>
-                        </div>
-                    `;
+            // Resolve all promises and sort files by upload date
+            return Promise.all(filePromises).then((files) =>
+                files.sort((a, b) => new Date(b.updated) - new Date(a.updated))
+            );
+        })
+        .then((sortedFiles) => {
+            // Render files in sorted order
+            sortedFiles.forEach((file, index) => {
+                const fileSizeMB = file.size / (1024 * 1024);
+                tot += fileSizeMB;
 
-                    // Add event listeners after appending the element
-                    fileList.appendChild(listItem);
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    (${index + 1}) ${file.name} (${fileSizeMB.toFixed(3)} MB) 
+                    <div class="btn">
+                        <button class="delete-btn">Delete</button>
+                        <button class="view-btn">View File</button>
+                    </div>
+                `;
 
-                    // Attach delete file functionality
-                    listItem.querySelector('.delete-btn').addEventListener('click', () => deleteFile(metadata.name));
+                // Append to list
+                fileList.appendChild(listItem);
 
-                    // Attach view file functionality
-                    listItem.querySelector('.view-btn').addEventListener('click', () => {
-                        window.open(downloadURL, '_blank'); // Open the file in a new tab
-                    });
+                // Add delete functionality
+                listItem.querySelector('.delete-btn').addEventListener('click', () => deleteFile(file.name));
 
-                    // Increment processed files count
-                    filesProcessed++;
-                    
-                    // Update total size only when all files are processed
-                    if (filesProcessed === totalFiles) {
-                        total_size.textContent = "Total storage used: " + tot.toFixed(4) + " MB";
-                    }
-                }).catch(error => {
-                    console.error('Error getting download URL:', error);
+                // Add view functionality
+                listItem.querySelector('.view-btn').addEventListener('click', () => {
+                    window.open(file.downloadURL, '_blank'); // Open in a new tab
                 });
-            }).catch(error => {
-                console.error('Error fetching file metadata:', error);
             });
+
+            // Update total size
+            total_size.textContent = "Total storage used: " + tot.toFixed(4) + " MB";
+        })
+        .catch((error) => {
+            console.error('Error listing files:', error);
         });
-    }).catch(error => {
-        console.error('Error listing files:', error);
-    });
 }
 
 
@@ -158,24 +172,65 @@ function encrypt(s, f) {
 
 // Function to delete a file
 function deleteFile(fileName) {
-    
-    // Using the prompt() function to get user input
-    const userInput = prompt("Enter password to delete file:", "eg: 1234");
-    
-    // Check if user provided input
-    if (encrypt(userInput,5) !== "#!5") {
-        alert("Delete Failed");
-        return;
-    } 
-    
-    const fileRef = ref(storage, fileName);
-    deleteObject(fileRef).then(() => {
-        alert('File deleted successfully.');
-        displayUploadedFiles();
-    }).catch(error => {
-        alert('Error deleting file:', error);
+    // Create a modal dialog for password input
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Enter password to delete the file:</h3>
+            <input type="password" id="password-input" placeholder="Eg. 12345" />
+            <button id="toggle-password">Show</button>
+            <button id="confirm-delete">Confirm</button>
+            <button id="cancel-delete">Cancel</button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const passwordInput = document.getElementById('password-input');
+    const togglePasswordButton = document.getElementById('toggle-password');
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    const cancelDeleteButton = document.getElementById('cancel-delete');
+
+    // Toggle password visibility
+    togglePasswordButton.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordButton.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordButton.textContent = 'Show';
+        }
+    });
+
+    // Confirm deletion
+    confirmDeleteButton.addEventListener('click', () => {
+        const userInput = passwordInput.value;
+
+        if (encrypt(userInput, 5) !== "#!5") {
+            alert('Delete Failed');
+        } else {
+            const fileRef = ref(storage, fileName);
+            deleteObject(fileRef)
+                .then(() => {
+                    alert('File deleted successfully.');
+                    displayUploadedFiles();
+                })
+                .catch((error) => {
+                    alert('Error deleting file:', error);
+                });
+        }
+
+        document.body.removeChild(modal); // Close the modal
+    });
+
+    // Cancel deletion
+    cancelDeleteButton.addEventListener('click', () => {
+        document.body.removeChild(modal); // Close the modal
     });
 }
+
 
 // Make functions accessible globally
 window.uploadFiles = uploadFiles;
