@@ -164,7 +164,8 @@ h2:hover{
 }
 
 /* ---------------popup message----------- */
-/* Popup styling */
+
+
 /* Overlay for background blur */
 #popup-overlay {
     position: fixed;
@@ -213,3 +214,5 @@ h2:hover{
 #popup-overlay.hidden {
     display: none;
 }
+
+/* ---------------popup message end ----------- */

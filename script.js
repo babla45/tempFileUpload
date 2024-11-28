@@ -18,19 +18,20 @@ const storage = getStorage(app);
 const storageRef = ref(storage);
 
 
+
 // -------popup message--------
-// calert == custom calert
+// calert == custom calert using popup message
 const calert = (message) => {
     const popup = document.getElementById('popup-message');
     const overlay = document.getElementById('popup-overlay');
-
+    
     // Set message and show popup with overlay
     popup.textContent = message;
     popup.classList.remove('hidden');
     popup.classList.add('visible');
     overlay.classList.remove('hidden');
     overlay.classList.add('visible');
-
+    
     // Hide popup and overlay after 2 seconds
     setTimeout(() => {
         popup.classList.remove('visible');
@@ -39,11 +40,9 @@ const calert = (message) => {
         overlay.classList.add('hidden');
     }, 2000);
 };
-
-
 // Replace the alert with this function
-// showPopupMessage(`Error uploading file: ${error}`);
-
+// calert(`Error uploading file: ${error}`);
+// -------popup message end--------
 
 
 
@@ -241,7 +240,7 @@ function deleteFile(fileName) {
         const userInput = passwordInput.value;
 
         if (encrypt(userInput, 5) !== "#!5") {
-            calert('Delete Failed');
+            calert('Incorrect Password. Delete Failed');
         } else {
             const fileRef = ref(storage, fileName);
             deleteObject(fileRef)
@@ -270,3 +269,10 @@ window.deleteFile = deleteFile;
 
 // Initial call to display uploaded files
 displayUploadedFiles();
+
+
+function welcomeMessage(){
+    calert("Hello !! Welcome to my Website");
+}
+
+welcomeMessage();
