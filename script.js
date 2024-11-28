@@ -17,6 +17,38 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const storageRef = ref(storage);
 
+
+// -------popup message--------
+// calert == custom calert
+const calert = (message) => {
+    const popup = document.getElementById('popup-message');
+    const overlay = document.getElementById('popup-overlay');
+
+    // Set message and show popup with overlay
+    popup.textContent = message;
+    popup.classList.remove('hidden');
+    popup.classList.add('visible');
+    overlay.classList.remove('hidden');
+    overlay.classList.add('visible');
+
+    // Hide popup and overlay after 2 seconds
+    setTimeout(() => {
+        popup.classList.remove('visible');
+        popup.classList.add('hidden');
+        overlay.classList.remove('visible');
+        overlay.classList.add('hidden');
+    }, 2000);
+};
+
+
+// Replace the alert with this function
+// showPopupMessage(`Error uploading file: ${error}`);
+
+
+
+
+
+
 // Function to upload files
 function uploadFiles() {
     const files = document.getElementById('file-upload').files;
@@ -24,14 +56,14 @@ function uploadFiles() {
     const progressText = document.getElementById('progress-text');
 
     if (!files.length) {
-        alert('Please select files to upload.');
+        calert('Please select files to upload.');
         return;
     }
 
     let totalSize = 0;
     for (let file of files) {
         if (file.size > 500 * 1024 * 1024) {
-            alert('File size exceeds the limit of 500MB.');
+            calert('File size exceeds the limit of 500MB.');
             return;
         }
         totalSize += file.size;
@@ -53,13 +85,13 @@ function uploadFiles() {
                 progressText.innerHTML = `Upload is ${totalProgress.toFixed(2)}% done`;
             },
             (error) => {
-                alert('Error uploading file:', error);
+                calert(`Error uploading file: ${error}`);
             },
             () => {
                 totalBytesTransferred += file.size;
 
                 if (totalBytesTransferred === totalSize) {
-                    alert('All files uploaded successfully.');
+                    calert('All files uploaded successfully.');
                     progressBar.value = 0;
                     progressText.innerHTML = '';
                     displayUploadedFiles();
@@ -209,16 +241,16 @@ function deleteFile(fileName) {
         const userInput = passwordInput.value;
 
         if (encrypt(userInput, 5) !== "#!5") {
-            alert('Delete Failed');
+            calert('Delete Failed');
         } else {
             const fileRef = ref(storage, fileName);
             deleteObject(fileRef)
                 .then(() => {
-                    alert('File deleted successfully.');
+                    calert('File deleted successfully.');
                     displayUploadedFiles();
                 })
                 .catch((error) => {
-                    alert('Error deleting file:', error);
+                    calert(`Error deleting file: ${error}`);
                 });
         }
 
