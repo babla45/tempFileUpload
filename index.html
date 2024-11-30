@@ -12,26 +12,36 @@
             !!...OWNER....!! <br><br>
             <b> Md Babla Islam </b>
         </h1><br>
-
+        
         <div class="h2-container">
             <h2>Uploaded Files</h2>
         </div>
-
+        
         <!-- ---popup message--- -->
         <div id="popup-overlay" class="hidden"></div>
         <div id="popup-message" class="hidden"></div>
         
-
+        
         
         <ul id="file-list"></ul>
-
+        
         <input type="file" id="file-upload" multiple />
         <button onclick="uploadFiles()">Upload</button>
-
+        
         <!-- Progress bar with percentage -->
         <progress id="progress-bar" value="0" max="100"></progress>
         <span id="progress-text"></span>
-        <b id="total-size">Total file size: </b>
+        <input type="button" id="2nd-website" value="2nd website" 
+       style="color: rgb(4, 160, 129); background-color: black; font-weight: bold; padding: 5px 8px;"
+       onclick="goToTempFile()">
+
+<script type="module">
+    import { goToTempFile } from './script.js';
+    // Attach the function to the global window object if you want to use it inline
+    window.goToTempFile = goToTempFile;
+</script>
+
+        <b id="total-size">Total file size: </b><br><br>
     </div>
     <script type="module" src="script.js"></script>
 </body>

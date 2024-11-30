@@ -255,6 +255,60 @@ function deleteFile(fileName) {
 
         document.body.removeChild(modal); // Close the modal
     });
+    
+    // Cancel deletion
+    cancelDeleteButton.addEventListener('click', () => {
+        document.body.removeChild(modal); // Close the modal
+    });
+}
+
+//goto temp file upload 2nd version 
+export function goToTempFile(){
+    // Create a modal dialog for password input
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Please Enter password:</h3>
+            <input type="password" id="password-input" placeholder="Eg. 12345" />
+            <button id="toggle-password">Show</button>
+            <button id="confirm-delete">Confirm</button>
+            <button id="cancel-delete">Cancel</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const passwordInput = document.getElementById('password-input');
+    const togglePasswordButton = document.getElementById('toggle-password');
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    const cancelDeleteButton = document.getElementById('cancel-delete');
+    
+    // Toggle password visibility
+    togglePasswordButton.addEventListener('click', () => {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordButton.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordButton.textContent = 'Show';
+        }
+    });
+
+    // Confirm deletion
+    confirmDeleteButton.addEventListener('click', () => {
+        const userInput = passwordInput.value;
+    
+        if (encrypt(userInput, 5) !== "#!5") {
+            calert('Incorrect Password. Website load failed');
+        } else {
+            window.location.href = "https://babla45.github.io/beautiful-images/uploadFile/index.html";
+        
+        }
+    
+        document.body.removeChild(modal); // Close the modal
+    });
 
     // Cancel deletion
     cancelDeleteButton.addEventListener('click', () => {
