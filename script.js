@@ -1,4 +1,4 @@
-// Import Firebase modules
+// Import Firebase modules and configuration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
 import { getStorage, ref, uploadBytesResumable, listAll, getMetadata, deleteObject, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 
@@ -17,10 +17,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const storageRef = ref(storage);
 
-
-
-// -------popup message--------
-// calert == custom calert using popup message
+// Alert function
 const calert = (message) => {
     const popup = document.getElementById('popup-message');
     const overlay = document.getElementById('popup-overlay');
@@ -49,17 +46,11 @@ const calert = (message) => {
         overlay.classList.add('hidden');
     }, 2000);
 };
-// Replace the alert with this function
-// calert(`Error uploading file: ${error}`);
-// -------popup message end--------
 
-
-
-
-
-// Function to upload files
+// Main functions
 function uploadFiles() {
     const files = document.getElementById('file-upload').files;
+    const progressSection = document.getElementById('progress-section');
     const progressBar = document.getElementById('progress-bar');
     const progressText = document.getElementById('progress-text');
 
@@ -67,6 +58,9 @@ function uploadFiles() {
         calert('Please select files to upload.');
         return;
     }
+
+    // Show progress section
+    progressSection.classList.remove('hidden');
 
     let totalSize = 0;
     for (let file of files) {
@@ -93,6 +87,7 @@ function uploadFiles() {
                 progressText.innerHTML = `Upload is ${totalProgress.toFixed(2)}% done`;
             },
             (error) => {
+                progressSection.classList.add('hidden');
                 calert(`Error uploading file: ${error}`);
             },
             () => {
@@ -102,6 +97,7 @@ function uploadFiles() {
                     calert('All files uploaded successfully.');
                     progressBar.value = 0;
                     progressText.innerHTML = '';
+                    progressSection.classList.add('hidden');
                     displayUploadedFiles();
 
                     // Clear file input after successful upload
@@ -112,8 +108,6 @@ function uploadFiles() {
     }
 }
 
-
-// Function to display uploaded files
 function displayUploadedFiles() {
     const fileList = document.getElementById('file-list');
     const total_size = document.getElementById('total-size');
@@ -158,11 +152,11 @@ function displayUploadedFiles() {
                         <span class="text-sm text-bold dark:text-gray-400 ml-2">(${fileSizeMB.toFixed(3)} MB)</span>
                     </div>
                     <div class="flex gap-2">
-                        <button class="view-btn px-4 py-1.5 bg-gray-900 dark:bg-black text-emerald-400 
+                        <button class="view-btn px-4 py-1.5 bg-gray-800 dark:bg-black text-emerald-400 
                                      dark:text-emerald-300 rounded-lg shadow-lg shadow-black/20 
                                      hover:bg-gray-800 dark:hover:bg-gray-900 
-                                     transition-all duration-200">View File</button>
-                        <button class="delete-btn px-4 py-1.5 bg-gray-900 dark:bg-black text-emerald-400 
+                                     transition-all duration-200">Download</button>
+                        <button class="delete-btn px-4 py-1.5 bg-gray-800 dark:bg-black text-emerald-400 
                                      dark:text-emerald-300 rounded-lg shadow-lg shadow-black/20 
                                      hover:bg-gray-800 dark:hover:bg-gray-900 
                                      transition-all duration-200">Delete</button>
@@ -195,7 +189,6 @@ function displayUploadedFiles() {
         });
 }
 
-
 function encrypt(s, f) {
     var strArr = s.split(''); // Convert the string to an array of characters
     var sum;
@@ -224,9 +217,6 @@ function encrypt(s, f) {
     return strArr.join(''); // Convert the array back to a string
 }
 
-
-
-// Function to delete a file
 function deleteFile(fileName) {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm';
@@ -300,8 +290,7 @@ function deleteFile(fileName) {
     });
 }
 
-//goto temp file upload 2nd version 
-export function goToTempFile(){
+export function goToTempFile() {
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm';
 
@@ -367,15 +356,12 @@ export function goToTempFile(){
     });
 }
 
-
-// Make functions accessible globally
+// Make functions accessible globally and initialize
 window.uploadFiles = uploadFiles;
 window.deleteFile = deleteFile;
-
-// Initial call to display uploaded files
 displayUploadedFiles();
 
-// Add dark mode toggle function
+// Dark mode setup
 function setupDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     
@@ -393,5 +379,4 @@ function setupDarkMode() {
     });
 }
 
-// Initialize dark mode
 setupDarkMode();
