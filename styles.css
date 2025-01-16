@@ -1,218 +1,63 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-}
-
-.container {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px 12px rgba(0,0,0,0.1);
-}
-h1{
-    color: rgb(11, 18, 101);
-    text-align: center;
-    border-radius: 12px;
-    padding: 15px 0px 25px 0px;
-    box-shadow: var(--custom-box-shadow1);
-}
-b{
-    background-color: rgb(0, 0, 0);
-    color: #fff;
-    padding: 3px;
-    border-radius: 5px;
-    text-align: center;
-}
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    box-shadow: 0 0 5px 2px rgb(51, 49, 49);
-    box-shadow: var(--custom-box-shadow3);
-    margin-bottom: 25px;
-    padding: 6px;
-    padding-bottom: 8px;
-    color: black;
-    font-weight: bold;
-
-    border-radius: 5px;
-}
-
-button {
-    background-color: #000000;
-    color: white;
-    padding: 2.6px 8px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    margin-right: 5px;
-}
-.btn{
-    display: flex;
-    justify-content: flex-end;
-}
-input {
-    padding: 4px;
-    box-shadow: 0 0 10px -0.01px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    cursor: pointer;
-    margin-right: 5px;
-}
-
-button:hover, h1:hover, li:hover, b:hover, input:hover {
-    box-shadow: 0 0 10px 2px rgb(255, 21, 21);
-    background-color: rgb(255, 255, 255);
-    color: rgb(7, 7, 7);
-    font-weight: bold;
-    border-radius: 4px;
-}
-
-/* Progress bar styling */
+/* Custom progress bar styling */
 progress {
-    width: 100%;
-    height: 20px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    @apply h-2 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700;
 }
 
-
-/* -------password input field--------- */
-
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.932);
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center;    /* Center vertically */
-    z-index: 1000;
+progress::-webkit-progress-bar {
+    @apply bg-gray-200 dark:bg-gray-700;
 }
 
-:root {
-    --custom-box-shadow1: 
-        5px  0px 10px -0.5px rgb(173, 5, 5),
-        0px  5px 10px -0.5px rgb(99, 7, 122),
-       -5px  0px 10px -0.5px rgb(15, 5, 124),
-        0px -5px 10px -0.5px rgb(0, 82, 85);
-        
-        --custom-box-shadow2: 
-            13px  0px 0.5px  rgb(173, 5, 5),
-            0px  13px 0.5px  rgb(99, 7, 122),
-           -13px  0px 0.5px  rgb(15, 5, 124),
-            0px -13px 0.5px  rgb(0, 82, 85);
-
-        --custom-box-shadow3: 
-        0.01px  0px 10px -0.5px rgb(95, 173, 5),
-        0px  0.01px 10px -0.5px rgb(243, 11, 11),
-       -0.01px  0px 10px -0.5px rgb(14, 6, 104),
-        0px -0.01px 10px -0.5px rgb(0, 8, 85);
-
+progress::-webkit-progress-value {
+    @apply bg-blue-500 dark:bg-blue-400 transition-all duration-300;
 }
 
+progress::-moz-progress-bar {
+    @apply bg-blue-500 dark:bg-blue-400;
+}
+h6{
+    color: #0e0c0c;
+}
+
+/* Remove old modal styling */
+/* .modal {
+    @apply fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm;
+}
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 22px;
-    text-align: center;
-    box-shadow: var(--custom-box-shadow2);
-    width: 300px; /* Set a fixed width for better alignment */
+    @apply bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full mx-4 space-y-4;
+} */
+
+/* Add new animation for modal */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-.modal-content input {
-    margin: 10px 0;
-    padding: 8px;
-    width: 100%; /* Ensure the input spans the modal's width */
-    box-sizing: border-box; 
-    /* Include padding and borders in width calculation */
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
 }
 
-.modal-content input:hover{
-    box-shadow: var(--custom-box-shadow1);
-}
-button:hover{
-    box-shadow: var(--custom-box-shadow1);
+/* Animation */
+.fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-.modal-content button {
-    margin: 5px;
-    padding: 8px 15px;
-    cursor: pointer;
-}
-.h2-container{
-    display: flex;
-    justify-content: center;
-}
-h2{
-    font-size: 28px; 
-    border-radius: 12px;
-    color: rgb(10, 2, 82);
-    padding: 2px 35px;
-    box-shadow: var(--custom-box-shadow3);
-}
-h2:hover{
-    background-color: black;
-    color: white;
-    box-shadow: var(--custom-box-shadow1);
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-/* ---------------popup message----------- */
-
-
-/* Overlay for background blur */
-#popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-    backdrop-filter: blur(5px); /* Apply blur effect */
-    z-index: 999; /* Just below the popup */
-    opacity: 0;
-    transition: opacity 0.4s;
+/* Add these new animations */
+@keyframes bounce {
+    0%, 100% { transform: translateY(-5px) translateX(-50%); }
+    50% { transform: translateY(0) translateX(-50%); }
 }
 
-/* Show overlay */
-#popup-overlay.visible {
-    opacity: 1;
+.animate-bounce {
+    animation: bounce 1s infinite;
 }
 
-/* Popup styling */
+/* Make sure the popup has a nice transition */
 #popup-message {
-    position: fixed;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px 25px;
-    background-color: #030303;
-    color: white;
-    font-size: 26px;
-    font-weight: bold;
-    border-radius: 22px;
-    box-shadow: var(--custom-box-shadow1, 0 4px 6px rgba(0, 0, 0, 0.2));
-    opacity: 0;
-    transition: opacity 0.4s, transform 0.5s;
-    z-index: 1000; /* Above the overlay */
-    text-align: center;
-    max-width: 90%;
-    word-wrap: break-word;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-#popup-message.visible {
-    opacity: 1;
-}
-
-#popup-message.hidden,
-#popup-overlay.hidden {
-    display: none;
-}
-
-/* ---------------popup message end ----------- */

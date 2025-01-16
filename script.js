@@ -26,17 +26,26 @@ const calert = (message) => {
     const overlay = document.getElementById('popup-overlay');
     
     // Set message and show popup with overlay
+    if (message.toLowerCase().includes('error') || message.toLowerCase().includes('failed')) {
+        popup.className = `bg-gradient-to-r from-red-500 to-rose-600
+                          text-white text-lg font-bold px-8 py-4 rounded-lg
+                          shadow-2xl border-2 border-white/20 transform scale-110`;
+    } else if (message.toLowerCase().includes('success')) {
+        popup.className = `bg-gradient-to-r from-green-500 to-emerald-600
+                          text-white text-lg font-bold px-8 py-4 rounded-lg
+                          shadow-2xl border-2 border-white/20 transform scale-110`;
+    } else {
+        popup.className = `bg-gradient-to-r from-blue-500 to-purple-600
+                          text-white text-lg font-bold px-8 py-4 rounded-lg
+                          shadow-2xl border-2 border-white/20 transform scale-110`;
+    }
+    
     popup.textContent = message;
     popup.classList.remove('hidden');
-    popup.classList.add('visible');
     overlay.classList.remove('hidden');
-    overlay.classList.add('visible');
     
-    // Hide popup and overlay after 2 seconds
     setTimeout(() => {
-        popup.classList.remove('visible');
         popup.classList.add('hidden');
-        overlay.classList.remove('visible');
         overlay.classList.add('hidden');
     }, 2000);
 };
@@ -142,11 +151,21 @@ function displayUploadedFiles() {
                 tot += fileSizeMB;
 
                 const listItem = document.createElement('li');
+                listItem.className = 'p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md flex justify-between items-center';
                 listItem.innerHTML = `
-                    (${index + 1}) ${file.name} (${fileSizeMB.toFixed(3)} MB) 
-                    <div class="btn">
-                        <button class="delete-btn">Delete</button>
-                        <button class="view-btn">View File</button>
+                    <div class="flex-1">
+                        <span class="font-medium text-gray-700 dark:text-gray-200">${index + 1}. ${file.name}</span>
+                        <span class="text-sm text-bold dark:text-gray-400 ml-2">(${fileSizeMB.toFixed(3)} MB)</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="view-btn px-4 py-1.5 bg-gray-900 dark:bg-black text-emerald-400 
+                                     dark:text-emerald-300 rounded-lg shadow-lg shadow-black/20 
+                                     hover:bg-gray-800 dark:hover:bg-gray-900 
+                                     transition-all duration-200">View File</button>
+                        <button class="delete-btn px-4 py-1.5 bg-gray-900 dark:bg-black text-emerald-400 
+                                     dark:text-emerald-300 rounded-lg shadow-lg shadow-black/20 
+                                     hover:bg-gray-800 dark:hover:bg-gray-900 
+                                     transition-all duration-200">Delete</button>
                     </div>
                 `;
 
@@ -162,8 +181,14 @@ function displayUploadedFiles() {
                 });
             });
 
-            // Update total size
-            total_size.textContent = "Total storage used: " + tot.toFixed(4) + " MB";
+            // Update total size with colorful formatting
+            total_size.innerHTML = `
+            <span class="inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                </svg>
+                Total Storage Used: ${tot.toFixed(2)} MB
+            </span>`;
         })
         .catch((error) => {
             console.error('Error listing files:', error);
@@ -203,17 +228,30 @@ function encrypt(s, f) {
 
 // Function to delete a file
 function deleteFile(fileName) {
-    // Create a modal dialog for password input
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm';
 
     modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Enter password to delete the file:</h3>
-            <input type="password" id="password-input" placeholder="Eg. 12345" />
-            <button id="toggle-password">Show</button>
-            <button id="confirm-delete">Confirm</button>
-            <button id="cancel-delete">Cancel</button>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl max-w-md w-full mx-4 animate-fadeIn">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Enter password to delete the file:</h3>
+            <input type="password" id="password-input" 
+                   class="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 
+                          bg-white dark:bg-gray-700 text-gray-800 dark:text-white mb-4" 
+                   placeholder="Enter password" />
+            <div class="flex gap-3 justify-end">
+                <button id="toggle-password"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors">
+                    Show
+                </button>
+                <button id="confirm-delete"
+                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded transition-colors">
+                    Delete
+                </button>
+                <button id="cancel-delete"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors">
+                    Cancel
+                </button>
+            </div>
         </div>
     `;
 
@@ -264,20 +302,33 @@ function deleteFile(fileName) {
 
 //goto temp file upload 2nd version 
 export function goToTempFile(){
-    // Create a modal dialog for password input
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm';
 
     modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Please Enter password:</h3>
-            <input type="password" id="password-input" placeholder="Eg. 12345" />
-            <button id="toggle-password">Show</button>
-            <button id="confirm-delete">Confirm</button>
-            <button id="cancel-delete">Cancel</button>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl max-w-md w-full mx-4 animate-fadeIn">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Enter password to access second website:</h3>
+            <input type="password" id="password-input" 
+                   class="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 
+                          bg-white dark:bg-gray-700 text-gray-800 dark:text-white mb-4" 
+                   placeholder="Enter password" />
+            <div class="flex gap-3 justify-end">
+                <button id="toggle-password"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors">
+                    Show
+                </button>
+                <button id="confirm-delete"
+                        class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors">
+                    Access
+                </button>
+                <button id="cancel-delete"
+                        class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded transition-colors">
+                    Cancel
+                </button>
+            </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
     
     const passwordInput = document.getElementById('password-input');
@@ -324,9 +375,23 @@ window.deleteFile = deleteFile;
 // Initial call to display uploaded files
 displayUploadedFiles();
 
+// Add dark mode toggle function
+function setupDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'true' || 
+        (!localStorage.getItem('darkMode') && 
+         window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    }
 
-function welcomeMessage(){
-    calert("Hello !! Welcome to my Website");
+    darkModeToggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('darkMode', 
+            document.documentElement.classList.contains('dark'));
+    });
 }
 
-welcomeMessage();
+// Initialize dark mode
+setupDarkMode();
